@@ -27,6 +27,7 @@ class GameScene: SKScene {
   
   // Private GameScene Properties
     
+    var tapQueue = [Int]()
     let motionManager = CMMotionManager()
   
   var contentCreated = false
@@ -34,6 +35,11 @@ class GameScene: SKScene {
     var invaderMovementDirection: InvaderMovementDirection = .right
     var timeOfLastMove: CFTimeInterval = 0.0
     let timePerMove: CFTimeInterval = 1.0
+    
+    enum BulletType {
+        case shipFired
+        case invaderFired
+    }
     
     enum InvaderMovementDirection {
         case right
@@ -67,6 +73,9 @@ class GameScene: SKScene {
     let kScoreHudName = "scoreHud"
     let kHealthHudName = "healthHud"
     
+    let kShipFiredBulletName = "shipFiredBullet"
+    let kInvaderFiredBulletName = "invaderFiredBullet"
+    let kBulletSize = CGSize(width: 4, height: 8)
   
   // Object Lifecycle Management
   
@@ -178,6 +187,21 @@ class GameScene: SKScene {
         addChild(healthLabel)
     }
     
+    func makeBullet(ofType bulletType: BulletType) -> SKNode {
+        var bullet: SKNode
+        
+        switch bulletType {
+        case .shipFired:
+            bullet = SKSpriteNode(color: SKColor.green, size: kBulletSize)
+            bullet.name = kShipFiredBulletName
+        case .invaderFired:
+            bullet = SKSpriteNode(color: SKColor.magenta, size: kBulletSize)
+            bullet.name = kInvaderFiredBulletName
+            break
+        }
+        
+        return bullet
+    }
     
   // Scene Update
     
@@ -259,6 +283,13 @@ class GameScene: SKScene {
   // Bullet Helpers
   
   // User Tap Helpers
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first {
+            if (touch.tapCount == 1) {
+                tapQueue.append(1)
+            }
+        }
+    }
   
   // HUD Helpers
   
